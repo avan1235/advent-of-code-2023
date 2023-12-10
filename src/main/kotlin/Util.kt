@@ -66,3 +66,28 @@ fun catchSystemOut(action: () -> Unit) = ByteArrayOutputStream().also {
   action()
   System.setOut(originalOut)
 }.toString()
+
+interface Graph<Node> {
+  enum class SearchType { DFS, BFS }
+
+  fun neighbours(node: Node): Iterable<Node>
+
+  fun search(
+    from: Node,
+    type: SearchType,
+    visit: (Node, Node) -> Boolean = { _, _ -> true },
+    action: (node: Node, distance: Int) -> Unit = { _, _ -> },
+  ): Set<Node> {
+    val visited = mutableSetOf<Node>()
+    val queue = ArrayDeque<Pair<Node, Int>>()
+    tailrec fun go(curr: Pair<Node, Int>) {
+      visited += curr.also { action(it.first, it.second) }.first
+      neighbours(curr.first).forEach { if (it !in visited && visit(curr.first, it)) queue += Pair(it, curr.second + 1) }
+      when (type) {
+        SearchType.DFS -> go(queue.removeLastOrNull() ?: return)
+        SearchType.BFS -> go(queue.removeFirstOrNull() ?: return)
+      }
+    }
+    return visited.also { go(Pair(from, 0)) }
+  }
+}
