@@ -15,7 +15,7 @@ fun <T> T.printIt() = also { println(it) }
 fun <U, V> List<U>.groupSeparatedBy(
   separator: (U) -> Boolean,
   includeSeparator: Boolean = false,
-  transform: (List<U>) -> V
+  transform: (List<U>) -> V,
 ): List<V> = sequence {
   var curr = mutableListOf<U>()
   forEach {
@@ -36,7 +36,7 @@ infix fun Int.directedTo(o: Int) = if (this <= o) this..o else this downTo o
 
 class DefaultMap<K, V>(
   private val default: V,
-  private val map: MutableMap<K, V> = HashMap()
+  private val map: MutableMap<K, V> = HashMap(),
 ) : MutableMap<K, V> by map {
   override fun get(key: K): V = map.getOrDefault(key, default).also { map[key] = it }
   operator fun plus(kv: Pair<K, V>): DefaultMap<K, V> = (map + kv).toDefaultMap(default)
@@ -49,7 +49,7 @@ fun <K, V> Map<K, V>.toDefaultMap(default: V) = DefaultMap(default, toMutableMap
 
 class LazyDefaultMap<K, V>(
   private val default: () -> V,
-  private val map: MutableMap<K, V> = HashMap()
+  private val map: MutableMap<K, V> = HashMap(),
 ) : MutableMap<K, V> by map {
   override fun get(key: K): V = map.getOrDefault(key, default()).also { map[key] = it }
   operator fun plus(kv: Pair<K, V>): LazyDefaultMap<K, V> = (map + kv).toLazyDefaultMap(default)
@@ -91,3 +91,5 @@ interface Graph<Node> {
     return visited.also { go(Pair(from, 0)) }
   }
 }
+
+fun <T> List<T>.repeat(count: Int): List<T> = List(size * count) { this[it % size] }
