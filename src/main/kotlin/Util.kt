@@ -1,6 +1,8 @@
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
+inline fun <T: Any> runIf(c: Boolean, action: () -> T): T? = if (c) action() else null
+
 inline fun <reified T> String.value(): T = when (T::class) {
   String::class -> this as T
   Long::class -> toLongOrNull() as T
