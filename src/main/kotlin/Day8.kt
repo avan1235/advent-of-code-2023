@@ -18,12 +18,6 @@ data object Day8 : AdventDay() {
 
 private enum class Instruction { L, R }
 
-private tailrec fun gcd(a: Long, b: Long): Long =
-  if (b == 0L) a else gcd(b, a % b)
-
-private fun lcm(a: Long, b: Long): Long =
-  a / gcd(a, b) * b
-
 private class Network(
   private val l: Map<String, String>,
   private val r: Map<String, String>,
