@@ -1,7 +1,7 @@
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
-inline fun <T: Any> runIf(c: Boolean, action: () -> T): T? = if (c) action() else null
+inline fun <T : Any> runIf(c: Boolean, action: () -> T): T? = if (c) action() else null
 
 inline fun <reified T> String.value(): T = when (T::class) {
   String::class -> this as T
@@ -72,25 +72,39 @@ fun catchSystemOut(action: () -> Unit) = ByteArrayOutputStream().also {
 interface Graph<Node> {
   enum class SearchType { DFS, BFS }
 
-  fun neighbours(node: Node): Iterable<Node>
+  fun neighbours(node: Node): Sequence<Node>
 
   fun search(
     from: Node,
     type: SearchType,
-    visit: (Node, Node) -> Boolean = { _, _ -> true },
+    checkIfVisited: Boolean = true,
+    checkIfOnQueue: Boolean = false,
+    visit: (from: Node, to: Node, toDistance: Int) -> Boolean = { _, _, _ -> true },
     action: (node: Node, distance: Int) -> Unit = { _, _ -> },
   ): Set<Node> {
+    data class NodeAtDistance(val node: Node, val distance: Int)
+
     val visited = mutableSetOf<Node>()
-    val queue = ArrayDeque<Pair<Node, Int>>()
-    tailrec fun go(curr: Pair<Node, Int>) {
-      visited += curr.also { action(it.first, it.second) }.first
-      neighbours(curr.first).forEach { if (it !in visited && visit(curr.first, it)) queue += Pair(it, curr.second + 1) }
+    val onQueue = mutableSetOf<NodeAtDistance>()
+    val queue = ArrayDeque<NodeAtDistance>()
+    tailrec fun go(curr: NodeAtDistance) {
+      onQueue -= curr
+      visited += curr.also { action(it.node, it.distance) }.node
+      neighbours(curr.node).forEach {
+        if (checkIfVisited && it in visited) return@forEach
+        if (!visit(curr.node, it, curr.distance + 1)) return@forEach
+        val next = NodeAtDistance(it, curr.distance + 1)
+        if (checkIfOnQueue && next in onQueue) return@forEach
+
+        onQueue += next
+        queue += next
+      }
       when (type) {
         SearchType.DFS -> go(queue.removeLastOrNull() ?: return)
         SearchType.BFS -> go(queue.removeFirstOrNull() ?: return)
       }
     }
-    return visited.also { go(Pair(from, 0)) }
+    return visited.also { go(NodeAtDistance(from, 0)) }
   }
 }
 
@@ -100,4 +114,10 @@ tailrec fun gcd(a: Long, b: Long): Long =
   if (b == 0L) a else gcd(b, a % b)
 
 fun lcm(a: Long, b: Long): Long =
+  a / gcd(a, b) * b
+
+tailrec fun gcd(a: Int, b: Int): Int =
+  if (b == 0) a else gcd(b, a % b)
+
+fun lcm(a: Int, b: Int): Int =
   a / gcd(a, b) * b

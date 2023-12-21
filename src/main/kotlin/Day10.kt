@@ -76,7 +76,8 @@ private fun PipeLocation.supplementaryPipeGraphLocations(): List<SupplementaryPi
 private class SupplementaryPipeGraph(
   val adj: DefaultMap<SupplementaryPipeGraphLocation, List<SupplementaryPipeGraphLocation>>,
 ) : Graph<SupplementaryPipeGraphLocation> {
-  override fun neighbours(node: SupplementaryPipeGraphLocation): Iterable<SupplementaryPipeGraphLocation> = adj[node]
+  override fun neighbours(node: SupplementaryPipeGraphLocation): Sequence<SupplementaryPipeGraphLocation> =
+    adj[node].asSequence()
 }
 
 private class PipeGraph(
@@ -84,8 +85,8 @@ private class PipeGraph(
   val adj: DefaultMap<PipeLocation, List<PipeLocation>>,
 ) : Graph<PipeLocation> {
 
-  override fun neighbours(node: PipeLocation): Iterable<PipeLocation> =
-    adj[node]
+  override fun neighbours(node: PipeLocation): Sequence<PipeLocation> =
+    adj[node].asSequence()
 
   fun distances(from: PipeLocation = start.location): Map<PipeLocation, Int> = buildMap {
     search(from, Graph.SearchType.BFS) { location, distance ->
