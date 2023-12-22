@@ -69,7 +69,7 @@ private fun LightMap.countEnergized(start: LightData): Int {
 
     if (history.size == oldHistorySize) break
   }
-  return history.mapTo(LinkedHashSet()) { it.first }.size
+  return history.map2Set { it.first }.size
 }
 
 private typealias LightData = Pair<LightPosition, LightDirection>

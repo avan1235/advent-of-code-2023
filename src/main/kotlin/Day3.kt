@@ -34,7 +34,7 @@ private fun List<String>.toSchematicData(): SchematicData {
     fun collectCurrentSchematicNumber() {
       if (collected.isEmpty()) return
 
-      val collectedDigitsPositions = collected.mapTo(LinkedHashSet()) { it.second }
+      val collectedDigitsPositions = collected.map2Set { it.second }
       val schematicNumber = SchematicNumber(collected.toNumber(), collectedDigitsPositions)
       numbers += schematicNumber
       collectedDigitsPositions.forEach { numbersPositions[it] = schematicNumber }

@@ -121,3 +121,9 @@ tailrec fun gcd(a: Int, b: Int): Int =
 
 fun lcm(a: Int, b: Int): Int =
   a / gcd(a, b) * b
+
+inline fun <T, R> Iterable<T>.map2Set(
+  destination: MutableSet<R> = LinkedHashSet(),
+  transform: (T) -> R,
+): MutableSet<R> =
+  destination.apply { for (item in this@map2Set) add(transform(item)) }

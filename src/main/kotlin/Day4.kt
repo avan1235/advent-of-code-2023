@@ -37,7 +37,7 @@ private fun String.toCardsGroups(): CardsGroups {
       it
         .trim()
         .split(Regex("\\s+"))
-        .mapTo(LinkedHashSet()) { number -> number.trim().toInt() }
+        .map2Set { number -> number.trim().toInt() }
     }
   return CardsGroups(win, my)
 }
